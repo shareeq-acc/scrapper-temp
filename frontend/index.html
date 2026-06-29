@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>UGC Scraper</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="container">
+    <h1>UGC Scraper</h1>
+    <p class="subtitle">Paste URLs or upload a .txt file — get screenshots, HTML, media, and links</p>
+
+    <div class="card">
+      <label>Paste URLs (one per line)</label>
+      <textarea id="urlInput" placeholder="https://example.com&#10;https://another.com"></textarea>
+
+      <div class="divider">or</div>
+
+      <label>Upload .txt file</label>
+      <input type="file" id="fileInput" accept=".txt" />
+
+      <button id="submitBtn" onclick="submitUrls()">Start Scraping</button>
+    </div>
+
+    <div class="card" id="progressCard" style="display:none">
+      <div class="batch-summary">
+        <span>Total: <b id="totalCount">0</b></span>
+        <span>Completed: <b id="completedCount">0</b></span>
+        <span>Failed: <b id="failedCount">0</b></span>
+        <span>Pending: <b id="pendingCount">0</b></span>
+      </div>
+
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+
+      <button id="downloadBtn" onclick="downloadZip()" style="display:none">
+        Download All Results (ZIP)
+      </button>
+
+      <table id="jobsTable">
+        <thead>
+          <tr>
+            <th>URL</th>
+            <th>Status</th>
+            <th>Title</th>
+            <th>Links</th>
+            <th>Media</th>
+          </tr>
+        </thead>
+        <tbody id="jobsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

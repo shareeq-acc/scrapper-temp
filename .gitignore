@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+/jspm_packages/
+/web_modules/
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+*.env
+
+# Output / Scraper results
+results/
+downloads/
+temp/
+tmp/
+out/
+dist/
+build/
+
+# Debug and Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.log
+logs/
+
+# Playwright / Puppeteer artifacts
+.auth/
+.playwright/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor configuration files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
