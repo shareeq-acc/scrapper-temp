@@ -9,20 +9,30 @@ services:
       - ./results:/app/results
     environment:
       - PORT=3000
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/scraper
       - CONCURRENCY=5
       - TIMEOUT_MS=45000
       - RESULTS_DIR=/app/results
       - MAX_RETRIES=2
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
     depends_on:
-      - redis
+      - db
     restart: unless-stopped
 
-  redis:
-    image: redis:7-alpine
+  db:
+    image: postgres:15-alpine
     restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=scraper
+    ports:
+      - "5432:5432"
     volumes:
-      - redis_data:/data
+      - postgres_data:/var/lib/postgresql/data
 
 volumes:
-  redis_data:
+  postgres_data:

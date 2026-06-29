@@ -9,13 +9,13 @@
   "dependencies": {
     "archiver": "*",
     "axios": "*",
-    "bull": "*",
     "cheerio": "*",
     "cors": "*",
     "dotenv": "*",
     "express": "*",
-    "ioredis": "*",
     "multer": "*",
+    "pg": "^8.11.0",
+    "@aws-sdk/client-s3": "^3.500.0",
     "playwright": "*",
     "playwright-extra": "*",
     "puppeteer-extra-plugin-stealth": "*"

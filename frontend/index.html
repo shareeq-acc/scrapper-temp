@@ -5,53 +5,168 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UGC Scraper</title>
   <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts: Inter & Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
   <div class="container">
-    <h1>UGC Scraper</h1>
-    <p class="subtitle">Paste URLs or upload a .txt file — get screenshots, HTML, media, and links</p>
+    <header>
+      <h1>UGC Scraper</h1>
+      <p class="subtitle">Extract screenshots, HTML, media assets, and structured data in parallel</p>
+      
+      <!-- Tab Navigation -->
+      <div class="tab-container">
+        <button class="tab-btn active" id="tab-scraper" onclick="switchTab('scraper')">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          Scraper Dashboard
+        </button>
+        <button class="tab-btn" id="tab-history" onclick="switchTab('history')">
+          <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Scrape History
+        </button>
+      </div>
+    </header>
 
-    <div class="card">
-      <label>Paste URLs (one per line)</label>
-      <textarea id="urlInput" placeholder="https://example.com&#10;https://another.com"></textarea>
+    <!-- TAB 1: SCRAPER -->
+    <main id="scraper-section">
+      <div class="card glass">
+        <h2>Submit New Scrape</h2>
+        <p class="card-desc">Submit individual URLs or load a list from a text file</p>
+        
+        <label>Paste URLs (One URL per line)</label>
+        <textarea id="urlInput" placeholder="https://example.com&#10;https://another-url.com"></textarea>
 
-      <div class="divider">or</div>
+        <div class="divider">
+          <span>OR</span>
+        </div>
 
-      <label>Upload .txt file</label>
-      <input type="file" id="fileInput" accept=".txt" />
+        <label>Upload .txt File</label>
+        <div class="file-upload-wrapper">
+          <input type="file" id="fileInput" accept=".txt" />
+          <span class="file-custom">Choose text file...</span>
+        </div>
 
-      <button id="submitBtn" onclick="submitUrls()">Start Scraping</button>
-    </div>
+        <button id="submitBtn" class="primary-btn" onclick="submitUrls()">
+          <span>Start Scraping</span>
+        </button>
+      </div>
 
-    <div class="card" id="progressCard" style="display:none">
+      <!-- Active Job Progress -->
+      <div class="card glass" id="progressCard" style="display:none">
+        <div class="card-header">
+          <h2>Active Progress</h2>
+          <button id="downloadBtn" class="success-btn" onclick="downloadZip()" style="display:none">
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Download Batch (ZIP)
+          </button>
+        </div>
+        
+        <div class="batch-summary">
+          <div class="stat-pill"><span class="label">Total</span><span class="value" id="totalCount">0</span></div>
+          <div class="stat-pill completed"><span class="label">Completed</span><span class="value" id="completedCount">0</span></div>
+          <div class="stat-pill failed"><span class="label">Failed</span><span class="value" id="failedCount">0</span></div>
+          <div class="stat-pill pending"><span class="label">Pending</span><span class="value" id="pendingCount">0</span></div>
+        </div>
+
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="table-container">
+          <table id="jobsTable">
+            <thead>
+              <tr>
+                <th>Target URL</th>
+                <th>Status</th>
+                <th>Site Title</th>
+                <th>Links</th>
+                <th>Media</th>
+              </tr>
+            </thead>
+            <tbody id="jobsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- TAB 2: HISTORY -->
+    <section id="history-section" style="display:none">
+      <div class="card glass">
+        <h2>Run History</h2>
+        <p class="card-desc">Track and download outputs from all historical scrape batches</p>
+
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Batch ID</th>
+                <th>Submitted At</th>
+                <th>Total URLs</th>
+                <th>Succeeded</th>
+                <th>Failed</th>
+                <th>Pending</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody">
+              <tr>
+                <td colspan="7" class="text-center">Loading batch history...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Controls -->
+        <div class="pagination">
+          <button id="prevBtn" class="pagination-btn" onclick="changePage(-1)" disabled>&larr; Previous</button>
+          <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+          <button id="nextBtn" class="pagination-btn" onclick="changePage(1)" disabled>Next &rarr;</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- DETAILS MODAL -->
+  <div id="detailsModal" class="modal" style="display:none">
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-content glass">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Batch Details</h2>
+          <p id="modalBatchId" class="modal-subtitle"></p>
+        </div>
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+      </div>
+      
       <div class="batch-summary">
-        <span>Total: <b id="totalCount">0</b></span>
-        <span>Completed: <b id="completedCount">0</b></span>
-        <span>Failed: <b id="failedCount">0</b></span>
-        <span>Pending: <b id="pendingCount">0</b></span>
+        <div class="stat-pill"><span class="label">Total</span><span class="value" id="modalTotalCount">0</span></div>
+        <div class="stat-pill completed"><span class="label">Completed</span><span class="value" id="modalCompletedCount">0</span></div>
+        <div class="stat-pill failed"><span class="label">Failed</span><span class="value" id="modalFailedCount">0</span></div>
+        <div class="stat-pill pending"><span class="label">Pending</span><span class="value" id="modalPendingCount">0</span></div>
       </div>
 
-      <div class="progress-bar-wrap">
-        <div class="progress-bar" id="progressBar"></div>
-      </div>
-
-      <button id="downloadBtn" onclick="downloadZip()" style="display:none">
-        Download All Results (ZIP)
+      <button id="modalDownloadBtn" class="success-btn" onclick="downloadModalZip()">
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Download Batch (ZIP)
       </button>
 
-      <table id="jobsTable">
-        <thead>
-          <tr>
-            <th>URL</th>
-            <th>Status</th>
-            <th>Title</th>
-            <th>Links</th>
-            <th>Media</th>
-          </tr>
-        </thead>
-        <tbody id="jobsBody"></tbody>
-      </table>
+      <div class="table-container modal-table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Target URL</th>
+              <th>Status</th>
+              <th>Site Title</th>
+              <th>Links</th>
+              <th>Media</th>
+            </tr>
+          </thead>
+          <tbody id="modalJobsBody"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 
