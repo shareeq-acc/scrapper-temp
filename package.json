@@ -3,19 +3,19 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "start": "node init && node src/index.js",
+    "dev": "node init && node --watch src/index.js"
   },
   "dependencies": {
     "archiver": "*",
     "axios": "*",
-    "bull": "*",
     "cheerio": "*",
     "cors": "*",
     "dotenv": "*",
     "express": "*",
-    "ioredis": "*",
     "multer": "*",
+    "pg": "^8.11.0",
+    "@aws-sdk/client-s3": "^3.500.0",
     "playwright": "*",
     "playwright-extra": "*",
     "puppeteer-extra-plugin-stealth": "*"
